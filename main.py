@@ -5,21 +5,21 @@ import math
 from pytube import YouTube # pip install pytube
 
 
-cap = cv2.VideoCapture("videos/video2.mp4")
-os.chdir(r'C:/Users/Ido/Desktop/videoToImages/frams')
-fps = cap.get(cv2.CAP_PROP_FPS)
-dir_path = r"C:\Users\Ido\Desktop\videoToImages\frams"
 
+class Constants: #  change those
+    
+    FRAMS_FOLDER_PATH = r"C:\Users\Ido\Desktop\videoToImages\frams"
+    VIDEO_FOLDER_PATH = r"C:\Users\Ido\Desktop\videoToImages\videos"
+    
 
 def videoTime(cap):
     frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
     fps = cap.get(cv2.CAP_PROP_FPS)
     seconds = math.floor(frame_count/fps)
-
     return seconds
 
 def videoDownload(link):
-    os.chdir(r'C:/Users/Ido/Desktop/videoToImages/videos')
+    os.chdir(Constants.VIDEO_FOLDER_PATH)
     youtubeObject = YouTube(link)
     youtubeObject = youtubeObject.streams.get_highest_resolution()
     try:
@@ -30,8 +30,9 @@ def videoDownload(link):
     print("Download is completed successfully")
     return youtubeObject.get_file_path()
 
-def clearDicrectory(dirc_path):
 
+
+def clearDicrectory(dirc_path):
     for filename in os.listdir(dirc_path):
         file_path = os.path.join(dirc_path, filename)
         try:
@@ -44,6 +45,7 @@ def clearDicrectory(dirc_path):
 
 
 def videoToImagesByTime(video_path):
+    os.chdir(Constants.FRAMS_FOLDER_PATH)
     cap = cv2.VideoCapture(video_path)
     clearDicrectory(dir_path)
 
@@ -56,13 +58,17 @@ def videoToImagesByTime(video_path):
     start = input(
         f"if you choose {seconds_between_every_image} you will get {int(video_length_in_seconds/seconds_between_every_image)} images do you wish to continue? [N/Y]")
 
-    while (start != "Y" and start != "y"):
-        seconds_between_every_image = float(
-            input("please enter the amount of seconds you want between every frame: "))
+
+    if (start == "N" and start == "n"):
+        return 0
+
+    while ((start != "Y" and start != "y") and (start != "N" and start != "n")):
+        if (start == "N" and start == "n"):
+            return 0
         start = input(
             f"if you will choose {seconds_between_every_image} between every image you will get {int(video_length_in_seconds/seconds_between_every_image)} images do you wish to continue? [N/Y]")
 
-    frames_between_images = math.floor(seconds_between_every_image*fps)
+    frames_between_images = math.floor(seconds_between_every_image*cap.get(cv2.CAP_PROP_FPS))
 
     if start == "Y" or start == "y":
         while cap.isOpened():
@@ -79,7 +85,7 @@ def videoToImagesByTime(video_path):
 
 
 def videoToImagesByFrames(video_path):
-    
+    os.chdir(Constants.FRAMS_FOLDER_PATH)
     cap = cv2.VideoCapture(video_path)
     clearDicrectory(dir_path)
 
@@ -88,13 +94,18 @@ def videoToImagesByFrames(video_path):
     image_counter = 1
 
     frames_between_every_image = float(
-        input("please enter the a mount of frams you want between every frame: "))
+        input("please enter the a mount of frams you want between every image: "))
     start = input(
         f"if you choose {frames_between_every_image} between every image you will get {int(frame_count/frames_between_every_image)} images do you wish to continue? [N/Y]")
 
-    while (start != "Y" and start != "y"):
-        frames_between_every_image = float(
-            input("please enter the a mount of seconds you want between every frame: "))
+
+    if (start == "N" and start == "n"):
+        return 0
+
+    while ((start != "Y" and start != "y") and (start != "N" and start != "n")):
+        if (start == "N" and start == "n"):
+            return 0
+        
         start = input(
             f"if you will choose {frames_between_every_image} between every image you will get {int(frame_count/frames_between_every_image)} images do you wish to continue? [N/Y]")
 
@@ -112,5 +123,25 @@ def videoToImagesByFrames(video_path):
                 break
 
 
+video_or_youtube_path = input("do you want to download a youtube video [Y/N]? ").upper()
+
+    
+    
+while(video_or_youtube_path != "N" and video_or_youtube_path != "Y"):
+    video_or_youtube_path = input("do you want to download a youtube video [Y/N]? ").upper()
+
+    
+if(video_or_youtube_path == "N"):
+    videoPath = input("please enter your video path: ")
+    
+if(video_or_youtube_path == "Y"):
+    videoPath = videoDownload(input("please enter a youtube video url: "))
+
+
+
+
+dir_path = Constants.FRAMS_FOLDER_PATH
+
+videoToImagesByTime(videoPath)
 # videoToImagesByTime(r"C:\Users\Ido\Desktop\videoToImages\videos\video1.mp4")
-videoToImagesByFrames(r"C:\Users\Ido\Desktop\videoToImages\videos\video1.mp4")
+

@@ -59,3 +59,42 @@ print(Download(link))
 
 # video_length_in_seconds = videoTime(cap)
 
+def videoToImagesByTime(video_path):
+    
+    cap = cv2.VideoCapture(video_path)
+    clearDicrectory(dir_path)
+
+    frame_counter = 0
+    image_counter = 1
+    video_length_in_seconds = math.floor(videoTime(cap))
+
+    seconds_between_every_image = float(
+        input("please enter the amount of seconds you want between every frame: "))
+    start = input(
+        f"if you choose {seconds_between_every_image} you will get {int(video_length_in_seconds/seconds_between_every_image)} images do you wish to continue? [N/Y]")
+
+
+    if (start == "N" and start == "n"):
+        return 0
+
+    while ((start != "Y" and start != "y") and (start != "N" and start != "n")):
+        if (start == "N" and start == "n"):
+            return 0
+        start = input(
+            f"if you will choose {seconds_between_every_image} between every image you will get {int(video_length_in_seconds/seconds_between_every_image)} images do you wish to continue? [N/Y]")
+
+    frames_between_images = math.floor(seconds_between_every_image*fps)
+
+    if start == "Y" or start == "y":
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if ret:
+                if (frame_counter == frames_between_images):
+                    cv2.imwrite(f"img{image_counter}.jpg", frame)
+                    image_counter += 1
+                    frame_counter = 0
+
+                frame_counter += 1
+            else:
+                break
+
